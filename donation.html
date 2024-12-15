@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donate to Sahayak</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <link rel="stylesheet" href="donation.css">
+</head>
+<body>
+    <div class="container">
+        <div class="hero">
+            Together, we can make a difference!
+        </div>
+        <p class="note">Your support can bring hope to those in need. Help us create a brighter future by contributing to Sahayak.</p>
+        <button class="donate-button" onclick="showForm()">Donate Now</button>
+
+        <div class="form-container" id="donationForm">
+            <h2>Donate Now</h2>
+            <form id="donation-form">
+                <input type="text" id="donorName" placeholder="Your Name" required>
+                <input type="email" id="donorEmail" placeholder="Your Email" required>
+                <input type="tel" id="donorPhone" placeholder="Your Phone Number" required>
+                <input type="number" id="donationAmount" placeholder="Donation Amount" required>
+                <button type="button" onclick="submitDonation()">Submit</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBv3vKMih_ia_eADyo70cDHIrNTVBA-DM8",
+            authDomain: "sahayak-sss1234.firebaseapp.com",
+            databaseURL: "https://sahayak-sss1234-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "sahayak-sss1234",
+            storageBucket: "sahayak-sss1234.firebasestorage.app",
+            messagingSenderId: "883687602128",
+            appId: "1:883687602128:web:af63e6f2430a286ab56bd5",
+            measurementId: "G-JFRHLLZG1L"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        function showForm() {
+            document.getElementById('donationForm').style.display = 'block';
+        }
+
+        function validateForm() {
+            const donorName = document.getElementById('donorName').value.trim();
+            const donorEmail = document.getElementById('donorEmail').value.trim();
+            const donorPhone = document.getElementById('donorPhone').value.trim();
+            const donationAmount = document.getElementById('donationAmount').value.trim();
+
+            if (!donorName || !donorEmail || !donorPhone || !donationAmount) {
+                alert('Please fill out all the fields.');
+                return false;
+            }
+
+            if (!/^\d{10}$/.test(donorPhone)) {
+                alert('Please enter a valid 10-digit phone number.');
+                return false;
+            }
+
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(donorEmail)) {
+                alert('Please enter a valid email address.');
+                return false;
+            }
+
+            return true;
+        }
+
+        function submitDonation() {
+            if (!validateForm()) {
+                return;
+            }
+
+            const donorName = document.getElementById('donorName').value;
+            const donorEmail = document.getElementById('donorEmail').value;
+            const donorPhone = document.getElementById('donorPhone').value;
+            const donationAmount = document.getElementById('donationAmount').value;
+
+            db.collection('donations').add({
+                name: donorName,
+                email: donorEmail,
+                phone: donorPhone,
+                amount: donationAmount
+            })
+            .then(() => {
+                alert('Thank you for your generous donation!');
+                document.getElementById('donation-form').reset();
+                document.getElementById('donationForm').style.display = 'none';
+            })
+            .catch(error => {
+                console.error('Error adding donation: ', error);
+                alert('Something went wrong. Your details could not be submitted. Please try again later.');
+            });
+        }
+    </script>
+</body>
+</html>

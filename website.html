@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="website.css">
+    <title>Sahayak</title>
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-firestore.js"></script>
+</head>
+
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="logo">
+            <h1>Sahayak</h1>
+            <p>Elevate Humanity</p>
+        </div>
+        <nav class="navbar">
+            <a href="#home">Home</a>
+            <a href="#services">Services</a>
+            <a href="#photogallery">Photo Gallery</a>
+            <a href="#events">Events</a>
+            <a href="donation.html">Donation</a>
+            <a href="signup.html">Login/Signup</a>
+        </nav>
+    </header>
+
+    <!-- Empowerment Section -->
+    <section id="home" class="empowerment-section">
+        <h2>Empowering Communities Through Compassion!</h2>
+        <img src="https://techmahindrafoundation.org/wp-content/uploads/2020/03/TMF_Disability_Image1.jpg" alt="Empowering Communities" />
+    </section>
+
+
+    <!-- Services Section -->
+    <section id="services" class="services-section">
+        <h2>Our Services</h2>
+        <div class="service-box">
+            <div class="service">
+                <img src="https://i.pinimg.com/originals/5c/42/f4/5c42f4f908cc14fa56b82afc383cdc72.jpg" alt="Education">
+                <h3>Education</h3>
+                <p>We work to improve access to education for marginalized communities, focusing on quality and inclusivity through teacher training, resource development, and innovative teaching methods.</p>
+            </div>
+            <div class="service">
+                <img src="https://media.istockphoto.com/id/524903696/photo/poor-indian-children-asking-for-food-india.jpg?s=612x612&w=0&k=20&c=uAUDyZRdpReAW51hD29W7fOCTDzNrOdHkAdKXErbapU=" alt="Poverty Alleviation">
+                <h3>Poverty Alleviation</h3>
+                <p>We provide essential resources such as food, clean water, and shelter, addressing immediate needs and advocating for systemic changes to combat poverty and inequality.</p>
+            </div>
+            <div class="service">
+                <img src="https://st2.depositphotos.com/2001403/5308/v/450/depositphotos_53088729-Concept-for-health-care-and-medical-help.jpg" alt="Healthcare">
+                <h3>Healthcare</h3>
+                <p>Our healthcare initiatives focus on health education, hygiene awareness, and disease prevention to empower communities with the knowledge needed for healthy living.</p>
+            </div>
+        </div>
+    </section>
+
+<section id="photogallery" class="photo-gallery-section">
+    <h2>Photo Gallery</h2>
+    <div class="container">
+        <div id="photoCarousel" class="cards"></div>
+    </div>
+</section>
+
+
+<section id="family" class="family-section">
+    <div class="left-section">
+        <h2>Meet Our Family</h2>
+    </div>
+    <div class="right-section">
+        <div id="familyMember" class="family-member">
+            <button id="prevMember" class="margin-button">&lt;</button>
+            <img id="memberPhoto" src="" alt="Member Photo" />
+            <div class="member-details">
+                <h3 id="memberPost"></h3>
+                <h4 id="memberName"></h4>
+                <p id="memberDescription"></p>
+            </div>
+            <button id="nextMember" class="margin-button">&gt;</button>
+        </div>
+    </div>
+</section>
+
+
+    <!-- Events Section -->
+    <section id="events" class="events-section">
+        <h2>Upcoming Events</h2>
+        <div id="eventCarousel" class="event-carousel">
+            <!-- Dynamic event cards will be inserted here -->
+        </div>
+        <div class="carousel-controls">
+            <button id="prevBtn">&laquo; Previous</button>
+            <button id="nextBtn">Next &raquo;</button>
+        </div>
+    </section>
+
+
+
+    <!-- Firebase Script -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBv3vKMih_ia_eADyo70cDHIrNTVBA-DM8",
+            authDomain: "sahayak-sss1234.firebaseapp.com",
+            databaseURL: "https://sahayak-sss1234-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "sahayak-sss1234",
+            storageBucket: "sahayak-sss1234.firebasestorage.app",
+            messagingSenderId: "883687602128",
+            appId: "1:883687602128:web:af63e6f2430a286ab56bd5",
+            measurementId: "G-JFRHLLZG1L"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const eventCarousel = document.getElementById("eventCarousel");
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+
+        db.collection("agenda").get()
+            .then(snapshot => {
+                if (snapshot.empty) {
+                    eventCarousel.innerHTML = '<p class="no-events">No events are currently scheduled.</p>';
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const event = doc.data();
+                    const eventDate = event.eventDate?.toDate
+                        ? event.eventDate.toDate()
+                        : new Date(event.eventDate);
+                    const formattedDate = eventDate.toLocaleDateString('en-US');
+
+                    const eventCard = `
+                       <!-- Modify the eventCard HTML to include the Volunteer button -->
+<div class="event-card">
+    <h3>${event.eventName}</h3>
+    <p class="event-description">${event.description}</p>
+    <p class="event-date">Date: ${formattedDate}</p>
+    <p class="event-location">Location: ${event.location}</p>
+    <a href="${event.map_link || '#'}" target="_blank" class="map-button">Open Map</a>
+    <button class="volunteer-button" onclick="registerVolunteer('${event.eventName}')">Volunteer</button>
+</div>
+
+                    `;
+                    eventCarousel.innerHTML += eventCard;
+                });
+            })
+            .catch(error => {
+                console.error("Error fetching events: ", error);
+                eventCarousel.innerHTML = '<p class="no-events" style="color: red;">Failed to load events. Please try again later.</p>';
+            });
+
+        prevBtn.addEventListener("click", () => {
+            eventCarousel.scrollBy({ left: -320, behavior: "smooth" });
+        });
+
+        nextBtn.addEventListener("click", () => {
+            eventCarousel.scrollBy({ left: 320, behavior: "smooth" });
+        });
+
+function registerVolunteer(eventName) {
+    const userName = prompt("Enter your name:");
+    const userEmail = prompt("Enter your email:");
+
+    if (userName && userEmail) {
+        db.collection("volunteers").add({
+            name: userName,
+            email: userEmail,
+            event: eventName,
+            registeredAt: new Date()
+        })
+        .then(() => {
+            alert("Thank you for volunteering! Your details have been saved.");
+        })
+        .catch((error) => {
+            console.error("Error saving volunteer details: ", error);
+            alert("An error occurred while saving your details. Please try again.");
+        });
+    } else {
+        alert("Please enter all the required details.");
+    }
+}
+
+// Ensure Firestore is initialized before this code
+const photoCarousel = document.getElementById("photoCarousel");
+
+// Fetch photos from Firestore
+db.collection("photogallery")
+    .get()
+    .then(snapshot => {
+        if (snapshot.empty) {
+            photoCarousel.innerHTML = '<p class="no-images">No photos available in the gallery.</p>';
+            return;
+        }
+
+        const photos = [];
+        snapshot.forEach(doc => {
+            const photoData = doc.data();
+            if (photoData.photo) {
+                photos.push(photoData.photo); // Add photo URLs to an array
+            }
+        });
+
+        // Create the photo carousel
+        createPhotoCarousel(photos);
+    })
+    .catch(error => {
+        console.error("Error fetching photos from Firestore:", error);
+        photoCarousel.innerHTML = '<p style="color: red;">Failed to load photos.</p>';
+    });
+
+// Function to create a carousel
+function createPhotoCarousel(photos) {
+    // Generate HTML for each photo
+    const carouselHTML = photos.map((photo, index) => `
+        <div class="card ${index === 0 ? '' : (index === 1 ? 'inactive-right' : 'inactive')}" data-index="${index}">
+            <img src="${photo}" alt="Photo ${index + 1}">
+        </div>
+    `).join('');
+
+    // Insert the photos into the carousel
+    photoCarousel.innerHTML = carouselHTML;
+
+    // Enable carousel navigation
+    enableCarouselNavigation(photos.length);
+}
+
+// Function to enable carousel navigation
+function enableCarouselNavigation(totalPhotos) {
+    let currentIndex = 0;
+
+    // Update carousel state
+    function updateCarousel() {
+        const cards = document.querySelectorAll(".card");
+        cards.forEach((card, index) => {
+            card.classList.remove('inactive', 'inactive-right');
+
+            if (index === currentIndex) {
+                card.style.transform = "translateX(0) scale(1)";
+                card.style.opacity = "1";
+                card.style.zIndex = "1";
+            } else if (index < currentIndex) {
+                card.style.transform = "translateX(-40%) scale(0.8)";
+                card.style.opacity = "0.4";
+                card.style.zIndex = "0";
+                card.classList.add('inactive');
+            } else {
+                card.style.transform = "translateX(40%) scale(0.8)";
+                card.style.opacity = "0.4";
+                card.style.zIndex = "0";
+                card.classList.add('inactive-right');
+            }
+        });
+    }
+
+    // Add event listener to each photo card for navigation
+    const cards = document.querySelectorAll(".card");
+    cards.forEach(card => {
+        card.addEventListener("click", () => {
+            const direction = card.dataset.index > currentIndex ? "next" : "prev";
+            if (direction === "next") {
+                currentIndex = (currentIndex + 1) % totalPhotos;
+            } else {
+                currentIndex = (currentIndex - 1 + totalPhotos) % totalPhotos;
+            }
+            updateCarousel();
+        });
+    });
+
+    // Initialize the carousel
+    updateCarousel();
+}
+
+const members = [
+    {
+        photo: "https://via.placeholder.com/200",
+        post: "President ",
+        name: "Verril Vaz",
+        description: "Currently pursuing B.Tech Degree in Computer Science and Engineering at REVA University Bangalore.I am deeply passionate about community development and social impact, which aligns perfectly with my involvement in Sahayak, an NGO dedicated to empowering underserved communities. At Sahayak, me being the president iam working towards creating sustainable solutions that bring meaningful change. This experience has not only enhanced my sense of responsibility but also given me the opportunity to connect with individuals striving to make a difference."
+    },
+
+{
+        photo: "https://via.placeholder.com/200",
+        post: " Vice President ",
+        name: "Sujal Fuldevare ",
+        description: "Pursuing computer science and engineering in SRM University Chennai. Contributing to Sahayak by leading initiatives, and ensuring the smooth execution of projects and also focusing  on empowering volunteers and creating meaningful impact ."
+    },
+
+
+{
+        photo: "https://via.placeholder.com/200",
+        post: "Secretary",
+        name: "Shreeya Sungar",
+        description: "I'm currently pursuing B.E degree in Computer Science and Engineering in KLS GOGTE INSTITUTE OF TECHNOLOGY, BELGAUM. As the Secretary of Sahayak, I am dedicated to drive positive change through collaborative efforts. With a deep passion for social service and a commitment to sustainable development, I aim to make a lasting impact by empowering individuals."
+    },
+{
+        photo: "https://via.placeholder.com/200",
+        post: "Honourable Secretary ",
+        name: "Akhil Pishani ",
+        description: "Currently pursuing Bachelor of Engineering degree in Computer Science and Engineering at GIT College. passionate about technology and constantly seek opportunities to expand my knowledge and skills in the field of computer science.As a part of sahayak i am grateful to be the honorable  secretary of sahayak.My contribution to sahayak is to see overall management of the NGO and also to ensure the smooth run of sahayak."
+    },
+
+    {
+        photo: "https://via.placeholder.com/200",
+        post: "Treasurer",
+        name: "Goutam Patil",
+        description: "As the Treasurer of Sahayak NGO. I always try to manage and safeguard the organisation's finances with transparency and accuracy."
+    },
+    {
+        photo: "https://via.placeholder.com/200",
+        post: "Media Head",
+        name: "Atharv Sanjay Patil",
+        description: "Currently pursuing engineering in GIT, Belagavi. Alongside the activities we do in SAHAYAK, I also handle the media for showcasing the meaningful work we do."
+    },
+    {
+        photo: "https://via.placeholder.com/200",
+        post: "Volunteer ",
+        name: "Aditya Patil",
+        description: "I am a passionate and dedicated individual eager to support Sahayak NGO. I am committed to making a positive impact by contributing my skills in and working alongside like-minded individuals to create meaningful change."
+    }
+];
+
+let currentMemberIndex = 0;
+
+// Function to display the current member
+function displayMember(index) {
+    const member = members[index];
+    console.log("Displaying member:", member); // Debugging log
+    document.getElementById("memberPhoto").src = member.photo;
+    document.getElementById("memberPost").textContent = member.post;
+    document.getElementById("memberName").textContent = member.name;
+    document.getElementById("memberDescription").textContent = member.description;
+}
+
+// Initialize with the first member
+displayMember(currentMemberIndex);
+
+// Event listeners for navigation
+document.getElementById("prevMember").addEventListener("click", () => {
+    currentMemberIndex = (currentMemberIndex - 1 + members.length) % members.length; // Loop to last if at the first
+    displayMember(currentMemberIndex);
+});
+
+document.getElementById("nextMember").addEventListener("click", () => {
+    currentMemberIndex = (currentMemberIndex + 1) % members.length; // Loop back to the first member if at the last
+    displayMember(currentMemberIndex);
+});
+
+
+    </script>
+
+    <!-- Footer Section -->
+    <footer class="footer">
+        <h2>Contact Details</h2>
+        <div class="footer-content">
+            <div class="footer-item">
+                <p>Email: sahayakngo@gmail.com</p>
+            </div>
+            <div class="footer

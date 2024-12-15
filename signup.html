@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NGO Sign Up</title>
+    <link rel="stylesheet" href="signup.css">
+</head>
+
+
+<body>
+    <div class="container">
+        <h1>Sign Up for NGO</h1>
+        <form id="signupForm">
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="tel" id="phone" placeholder="Phone Number" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <textarea id="address" placeholder="Address" required></textarea>
+            <select id="role" required>
+                <option value="">Select Role</option>
+                <option value="donor">Donor</option>
+                <option value="volunteer">Volunteer</option>
+                <option value="admin">Admin</option>
+            </select>
+            <button type="submit">Sign Up</button>
+        </form>
+        <p>Already have an account? <a href="login.html">Login here</a></p>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
